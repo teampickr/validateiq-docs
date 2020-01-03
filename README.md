@@ -85,8 +85,63 @@ A example successful response is (HTTP code 200):
 
 You can submit multiple requests with the same analysis ID and code, and we will create incrementing versions. Images from previous versions are copied across. This is useful for adding new images to an analysis. Each version will produce a response and webhook call/email.
 
-# Polling for a response
-
 # Webhook Responses
 
+We recommend using webhooks as the best way to receive a response to your analysis requests.
+
+Once we have processed your request we will immediate trigger a webhook response if you provided a url to us when making the request. If you do not provide a webhook secret we will default to an empty string.
+
+Webhooks are send to you as POST HTTP method, with the following payload:
+
+```
+{
+   "Secret":"my-super-secret-code",
+   "AnalysisId":"6f056479-187a-4f71-a87d-dff53a07cd68",
+   "Code":1,
+   "Version": "v1"
+   "Result":{
+      "CheckResponses":[
+         {
+            "Name":"Dummy Check",
+            "Weight":1,
+            "Score":86.41125
+         }
+      ],
+      "OverallScore":86.41125,
+      "ManualCheckRequired":true,
+      "ManualCheckReason":"Minimum threshold not reached."
+   }
+}
+```
+
+`CheckResponses` may contain additional properties depending on the check type, but will always contain `Name`, `Weight` and `Score`.
+
+# Polling for a response
+
+You can poll an endpoint to check if an analysis has been processed yet. We do not recommend this, we would suggest using a webhook.
+
+The endpoint is:
+
+`https://api.validateiq.com/iq/analysis/{id}-{code}/{version?}`
+
+The version parameter is option, if omitted it will return the latest version.
+
+An example cURL request would be:
+
+
+```
+curl -H "Authorization: Bearer <token here>" -X POST https://api.validateiq.com/iq/analysis/6f056479-187a-4f71-a87d-dff53a07cd68-1
+```
+
+or, to get a specific version:
+
+```
+curl -H "Authorization: Bearer <token here>" -X POST https://api.validateiq.com/iq/analysis/6f056479-187a-4f71-a87d-dff53a07cd68-1/v1
+```
+
+The result will be the same as the webhook above, with the addition of a `Secret` key which is the same as the `WebhookSecret` property you passed to us when making your request.
+
+
 # Email notifications
+
+You can provide an `Email` property when creating an analysis request. If the analysis result has an overall score of <90% then we will send you an email notification.
