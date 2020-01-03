@@ -47,7 +47,7 @@ ValidateIQ is an asynchronous API. When we receive your request it is queued and
 To submit a new analysis request you need to provide the following properties in JSON format:
 
 |Property|Description|Required
-|:--|:--|:--|
+|:--|:--|:-:|
 |AnalysisId|This is an ID provided by your system, it must be unique on a per code basis. For example, you can use the same analysis ID across multiple codes. This value can only be alphanumeric plus hyphens.|✅
 |Code|This is the code of the checks you wish to be performed. Please contact us for a list of codes.|✅
 |Base64Images|This is an array of base64 encoded images, in either PNG or JPEG.|✅
