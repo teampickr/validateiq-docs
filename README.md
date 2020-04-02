@@ -50,7 +50,7 @@ To submit a new analysis request you need to provide the following properties in
 |:--|:--|:-:|
 |AnalysisId|This is an ID provided by your system, it must be unique on a per code basis. For example, you can use the same analysis ID across multiple codes. This value can only be alphanumeric plus hyphens.|✅
 |Code|This is the code of the checks you wish to be performed. Please contact us for a list of codes.|✅
-|Base64Images|This is an array of base64 encoded images, in either PNG or JPEG.|✅
+|ImageUrls|This is an array of image urls.|✅
 |WebhookUrl|This is a publicly accessible URL that you want us to `POST` your analysis results to once processed. You can use the `WebhookSecret` property to add a layer of protection.|
 |WebhookSecret|This is a secret string that we will send back to you with the analysis results, you can use this to check the message is really coming from us.|
 |Email|You can specify an email address that we should contact if a check fails to meet a 90% threshold.
@@ -63,14 +63,15 @@ An example JSON payload would be:
     "Code": 1,
     "WebhookUrl": "https://my-webhook.url/",
     "WebhookSecret": "my-super-secret-code",
-    "Base64Images": ["... base64 encoded image..."]
+    "ImageUrls": ["... image url ..."],
+    "Quantity": 5
 }
 ```
 
 An example cURL request would be:
 
 ```
-curl -d "{ \"AnalysisId\": \"6f056479-187a-4f71-a87d-dff53a07cd68\", \"Code\": 1, \"WebhookUrl\": \"https:\/\/my-webhook.url\/\", \"WebhookSecret\": \"my-super-secret-code\", \"Base64Images\": [\"... base64 encoded image...\"] }" -H "Authorization: Bearer <token here>" -X POST https://api.validateiq.com/iq/analysis
+curl -d "{ \"AnalysisId\": \"6f056479-187a-4f71-a87d-dff53a07cd68\", \"Code\": 1, \"WebhookUrl\": \"https:\/\/my-webhook.url\/\", \"WebhookSecret\": \"my-super-secret-code\", \"ImageUrls\": [\"... image url ...\"], \"Quantity\": 5 }" -H "Authorization: Bearer <token here>" -X POST https://api.validateiq.com/iq/analysis
 ```
 
 A example successful response is (HTTP code 200):
@@ -85,6 +86,8 @@ A example successful response is (HTTP code 200):
 
 You can submit multiple requests with the same analysis ID and code, and we will create incrementing versions. Images from previous versions are copied across. This is useful for adding new images to an analysis. Each version will produce a response and webhook call/email.
 
+For each subsequent request that you send, the new quantity value will override the existing one. If you do not specify a quantity, the quantity value from the previous analysis version will be used.
+
 # Webhook Responses
 
 We recommend using webhooks as the best way to receive a response to your analysis requests.
@@ -98,7 +101,8 @@ Webhooks are send to you as POST HTTP method, with the following payload:
    "Secret":"my-super-secret-code",
    "AnalysisId":"6f056479-187a-4f71-a87d-dff53a07cd68",
    "Code":1,
-   "Version": "v1"
+   "Version": "v1",
+   "Quantity: 5
    "Result":{
       "CheckResponses":[
          {
@@ -109,7 +113,13 @@ Webhooks are send to you as POST HTTP method, with the following payload:
       ],
       "OverallScore":86.41125,
       "ManualCheckRequired":true,
-      "ManualCheckReason":"Minimum threshold not reached."
+      "ManualCheckReason":"Minimum threshold not reached.",
+      "QuantityResults":[
+         {
+            "Name": "Dummy Check",
+            "Quantity: 1
+         }
+      ]
    }
 }
 ```
@@ -144,4 +154,4 @@ The result will be the same as the webhook above, with the addition of a `Secret
 
 # Email notifications
 
-You can provide an `Email` property when creating an analysis request. If the analysis result has an overall score of <90% then we will send you an email notification.
+For threshold analysis, you can provide an `Email` property when creating an analysis request. If the analysis result has an overall score of <90% then we will send you an email notification.
