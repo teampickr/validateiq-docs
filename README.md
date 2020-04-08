@@ -94,7 +94,7 @@ We recommend using webhooks as the best way to receive a response to your analys
 
 Once we have processed your request we will immediate trigger a webhook response if you provided a url to us when making the request. If you do not provide a webhook secret we will default to an empty string.
 
-Webhooks are send to you as POST HTTP method, with the following payload:
+Webhooks are sent to you as POST HTTP method, with the following payload:
 
 ```
 {
@@ -155,3 +155,7 @@ The result will be the same as the webhook above, with the addition of a `Secret
 # Email notifications
 
 For threshold analysis, you can provide an `Email` property when creating an analysis request. If the analysis result has an overall score of <90% then we will send you an email notification.
+
+# Specific READMEs
+
+[Covid 19 README](Covid_19_README.md)
